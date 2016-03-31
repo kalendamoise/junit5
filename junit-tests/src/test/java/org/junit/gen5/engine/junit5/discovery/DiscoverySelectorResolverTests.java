@@ -8,7 +8,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 
-package org.junit.gen5.engine.junit5.discoveryNEW;
+package org.junit.gen5.engine.junit5.discovery;
 
 import static org.junit.gen5.api.Assertions.*;
 import static org.junit.gen5.engine.junit5.discovery.JUnit5UniqueIdBuilder.*;
@@ -29,7 +29,6 @@ import org.junit.gen5.engine.discovery.ClasspathSelector;
 import org.junit.gen5.engine.discovery.MethodSelector;
 import org.junit.gen5.engine.discovery.PackageSelector;
 import org.junit.gen5.engine.discovery.UniqueIdSelector;
-import org.junit.gen5.engine.junit5.discovery.JUnit5EngineDescriptor;
 import org.junit.gen5.junit4.runner.JUnit5;
 import org.junit.runner.RunWith;
 

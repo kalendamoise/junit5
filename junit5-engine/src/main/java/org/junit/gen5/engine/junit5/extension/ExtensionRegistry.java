@@ -28,6 +28,7 @@ import org.junit.gen5.api.extension.ExtensionPointRegistry;
 import org.junit.gen5.api.extension.ExtensionPointRegistry.Position;
 import org.junit.gen5.api.extension.ExtensionRegistrar;
 import org.junit.gen5.commons.meta.API;
+import org.junit.gen5.commons.util.Preconditions;
 import org.junit.gen5.commons.util.ReflectionUtils;
 
 /**
@@ -62,23 +63,27 @@ public class ExtensionRegistry {
 	 */
 	public static ExtensionRegistry newRegistryFrom(ExtensionRegistry parentRegistry,
 			List<Class<? extends Extension>> extensionTypes) {
-
-		ExtensionRegistry newExtensionRegistry = new ExtensionRegistry(parentRegistry);
+		Preconditions.notNull(parentRegistry, "parentRegistry must not be null");
+		ExtensionRegistry newExtensionRegistry = new ExtensionRegistry(Optional.of(parentRegistry));
 		extensionTypes.forEach(newExtensionRegistry::registerExtension);
 		return newExtensionRegistry;
 	}
 
+	/**
+	 * Factory for creating and populating a new root registry with the default extension types.
+	 *
+	 * @return a new {@code ExtensionRegistry}
+	 */
+	public static ExtensionRegistry newRootRegistryWithDefaultExtensions() {
+		ExtensionRegistry extensionRegistry = new ExtensionRegistry(Optional.empty());
+		DEFAULT_EXTENSIONS.forEach(extensionRegistry::registerExtension);
+		return extensionRegistry;
+	}
+
 	private static final Logger LOG = Logger.getLogger(ExtensionRegistry.class.getName());
 
-	private static final List<Class<? extends Extension>> defaultExtensionTypes = Collections.unmodifiableList(
+	private static final List<Class<? extends Extension>> DEFAULT_EXTENSIONS = Collections.unmodifiableList(
 		Arrays.asList(DisabledCondition.class, TestInfoParameterResolver.class, TestReporterParameterResolver.class));
-
-	/**
-	 * @return the list of all extension types that are added by default to all root registries
-	 */
-	static List<Class<? extends Extension>> getDefaultExtensionTypes() {
-		return defaultExtensionTypes;
-	}
 
 	private final Set<Class<? extends Extension>> registeredExtensionTypes = new LinkedHashSet<>();
 
@@ -86,19 +91,8 @@ public class ExtensionRegistry {
 
 	private final Optional<ExtensionRegistry> parent;
 
-	public ExtensionRegistry() {
-		this(null);
-	}
-
-	ExtensionRegistry(ExtensionRegistry parent) {
-		this.parent = Optional.ofNullable(parent);
-		if (!this.parent.isPresent()) {
-			addDefaultExtensions();
-		}
-	}
-
-	private void addDefaultExtensions() {
-		getDefaultExtensionTypes().stream().forEach(this::registerExtension);
+	public ExtensionRegistry(Optional<ExtensionRegistry> parent) {
+		this.parent = parent;
 	}
 
 	/**
